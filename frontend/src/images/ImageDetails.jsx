@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
+import { ImageNameEditor } from "./ImageNameEditor";
 
 export function ImageDetails() {
   const { imageId } = useParams();
@@ -45,6 +46,11 @@ export function ImageDetails() {
     <>
       <h2>{image.name}</h2>
       <p>By {image.author.username}</p>
+      <ImageNameEditor
+        imageId={image._id}
+        initialValue={image.name}
+        onNameChange={(newName) => setImage({ ...image, name: newName })}
+      />
       <img className="ImageDetails-img" src={image.src} alt={image.name} />
     </>
   );
