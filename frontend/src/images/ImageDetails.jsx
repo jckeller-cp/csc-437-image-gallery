@@ -11,14 +11,14 @@ export function ImageDetails() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch("/api/images");
+        const response = await fetch("/api/images/" + imageId);
         if (!response.ok) {
           throw new Error(
             `Error: HTTP ${response.status} ${response.statusText}`,
           );
         }
         const data = await response.json();
-        setImage(data[imageId]);
+        setImage(data);
       } catch (err) {
         setError(err.message);
       } finally {

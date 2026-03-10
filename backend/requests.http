@@ -10,28 +10,40 @@ Content-Type: application/json # Content-Type header is a must if you're sending
 { "a": 1, "b": 2 }
 
 ### Get a single image - success (200)
-GET http://localhost:3000/api/images/0
+GET http://localhost:3000/api/images/69afc3cceb1292647e3d0cc7
+
+### Get a single image - invalid ObjectId (404)
+GET http://localhost:3000/api/images/asdf
+
+### Get a single image - doesn't exist (404)
+GET http://localhost:3000/api/images/69afc3cceb1292647e3d0cc6
 
 ### Rename image - success (204)
-PATCH http://localhost:3000/api/images/0
+PATCH http://localhost:3000/api/images/69afc3cceb1292647e3d0cc7
 Content-Type: application/json
 
 { "name": "My New Image Name" }
 
 ### Rename image - missing name (400)
-PATCH http://localhost:3000/api/images/0
+PATCH http://localhost:3000/api/images/69afc3cceb1292647e3d0cc7
 Content-Type: application/json
 
 {}
 
 ### Rename image - name too long (413)
-PATCH http://localhost:3000/api/images/0
+PATCH http://localhost:3000/api/images/69afc3cceb1292647e3d0cc7
 Content-Type: application/json
 
 { "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }
 
 ### Rename image - image not found (404)
-PATCH http://localhost:3000/api/images/nonexistent-id
+PATCH http://localhost:3000/api/images/69afc3cceb1292647e3d0cc6
+Content-Type: application/json
+
+{ "name": "Valid Name" }
+
+### Rename image - invalid id (404)
+PATCH http://localhost:3000/api/images/invalid-id
 Content-Type: application/json
 
 { "name": "Valid Name" }

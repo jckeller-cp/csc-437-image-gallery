@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 export function registerImageRoutes(app, imageProvider) {
   function waitDuration(numMs) {
     return new Promise((resolve) => setTimeout(resolve, numMs));
@@ -25,6 +27,14 @@ export function registerImageRoutes(app, imageProvider) {
       return;
     }
 
+    if (!ObjectId.isValid(imageId)) {
+      res.status(404).send({
+        error: "Not Found",
+        message: "Invalid image ID",
+      });
+      return;
+    }
+
     if (name.length > 100) {
       res.status(413).send({
         error: "Content Too Large",
@@ -33,7 +43,7 @@ export function registerImageRoutes(app, imageProvider) {
       return;
     }
 
-    imageProvider.renameImage(imageId, name).then((result) => {
+    imageProvider.renameImage(new ObjectId(imageId), name).then((result) => {
       if (result.matchedCount === 0) {
         res.status(404).send({
           error: "Not Found",
@@ -47,9 +57,18 @@ export function registerImageRoutes(app, imageProvider) {
 
   app.get("/api/images/:imageId", (req, res) => {
     const { imageId } = req.params;
+
+    if (!ObjectId.isValid(imageId)) {
+      res.status(404).send({
+        error: "Not Found",
+        message: "Invalid image ID",
+      });
+      return;
+    }
+
     waitDuration(1000)
       .then(() => {
-        return imageProvider.getImageById(imageId);
+        return imageProvider.getImageById(new ObjectId(imageId));
       })
       .then((image) => {
         if (image) {
