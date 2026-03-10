@@ -28,4 +28,33 @@ export class ImageProvider {
       ])
       .toArray();
   }
+
+  renameImage(imageId, newName) {
+    return this.collection.updateOne(
+      { _id: imageId },
+      { $set: { name: newName } }
+    );
+  }
+
+  getImageById(imageId) {
+    return this.collection
+      .aggregate([
+        { $match: { _id: imageId } },
+        {
+          $lookup: {
+            from: this.usersCollectionName,
+            localField: "authorId",
+            foreignField: "username",
+            as: "author",
+          },
+        },
+        {
+          $unwind: {
+            path: "$author",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+      ])
+      .next();
+  }
 }
