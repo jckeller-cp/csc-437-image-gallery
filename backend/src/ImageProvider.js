@@ -1,0 +1,31 @@
+import { getEnvVar } from "./getEnvVar.js";
+
+export class ImageProvider {
+  constructor(mongoClient) {
+    this.mongoClient = mongoClient;
+    const collectionName = getEnvVar("IMAGES_COLLECTION_NAME");
+    this.collection = this.mongoClient.db().collection(collectionName);
+    this.usersCollectionName = getEnvVar("USERS_COLLECTION_NAME");
+  }
+
+  getAllImages() {
+    return this.collection
+      .aggregate([
+        {
+          $lookup: {
+            from: this.usersCollectionName,
+            localField: "authorId",
+            foreignField: "username",
+            as: "author",
+          },
+        },
+        {
+          $unwind: {
+            path: "$author",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+      ])
+      .toArray();
+  }
+}
