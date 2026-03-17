@@ -114,22 +114,29 @@ export function registerImageRoutes(app, imageProvider) {
     async (req, res) => {
       const { username } = req.userInfo || {};
       if (!username) {
-        res.status(401).send({ error: "Unauthorized", message: "Authentication required to upload images" });
+        res.status(401).send({
+          error: "Unauthorized",
+          message: "Authentication required to upload images",
+        });
         return;
       }
 
       if (!req.file) {
-        res.status(400).send({ error: "Bad Request", message: "Image file is required" });
+        res
+          .status(400)
+          .send({ error: "Bad Request", message: "Image file is required" });
         return;
       }
 
       if (!req.body.name) {
-        res.status(400).send({ error: "Bad Request", message: "Image name is required" });
+        res
+          .status(400)
+          .send({ error: "Bad Request", message: "Image name is required" });
         return;
       }
 
       const result = await imageProvider.createImage({
-        src: req.file.filename,
+        src: `/uploads/${req.file.filename}`,
         name: req.body.name,
         authorId: username,
       });
