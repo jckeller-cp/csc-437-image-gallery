@@ -4,9 +4,10 @@ import { MainLayout } from "./MainLayout.jsx";
 
 export function UploadPage({ authToken }) {
   const [fileDataUrl, setFileDataUrl] = useState(null);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  async function uploadAction(previousState, formData) {
+  async function uploadAction(_prev, formData) {
     const response = await fetch("/api/images", {
       method: "POST",
       headers: {
@@ -16,15 +17,19 @@ export function UploadPage({ authToken }) {
     });
 
     if (!response.ok) {
-      return { error: "Upload failed. Please try again." };
+      setError("Upload failed. Please try again.");
+      return null;
     }
 
     const { id } = await response.json();
     navigate(`/images/${id}`);
-    return { error: null };
+    return null;
   }
 
-  const [state, formAction, isPending] = useActionState(uploadAction, { error: null });
+  // I separated out error into a separate state to better handle
+  // error clearing when the uploaded file changes. Hopefully that's
+  // okay.
+  const [, formAction, isPending] = useActionState(uploadAction, null);
 
   function readAsDataURL(file) {
     return new Promise((resolve, reject) => {
@@ -38,6 +43,7 @@ export function UploadPage({ authToken }) {
   function onFileChange(event) {
     const file = event.target.files[0];
     if (file) {
+      setError(null);
       readAsDataURL(file)
         .then((dataUrl) => setFileDataUrl(dataUrl))
         .catch((err) => console.error("Error reading file:", err));
@@ -70,7 +76,7 @@ export function UploadPage({ authToken }) {
       <div>
         {" "}
         {/* Preview img element */}
-        {!state.error && fileDataUrl && (
+        {!error && fileDataUrl && (
           <img
             style={{ width: "20em", maxWidth: "100%" }}
             src={fileDataUrl}
@@ -79,7 +85,7 @@ export function UploadPage({ authToken }) {
         )}
       </div>
 
-      {state.error && <p>{state.error}</p>}
+      {error && <p>{error}</p>}
 
       <input type="submit" value="Confirm upload" disabled={isPending} />
     </form>
