@@ -29,6 +29,13 @@ export class ImageProvider {
       .toArray();
   }
 
+  getImageAuthorId(imageId) {
+    return this.collection.findOne(
+      { _id: imageId },
+      { projection: { authorId: 1 } }
+    );
+  }
+
   renameImage(imageId, newName) {
     return this.collection.updateOne(
       { _id: imageId },

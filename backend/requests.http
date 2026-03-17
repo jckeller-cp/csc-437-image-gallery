@@ -1,6 +1,7 @@
 ### Get all images.  Each request **MUST** be delimited by a triple hash
 # This is a comment
 GET http://localhost:3000/api/images
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5ld3VzZXIiLCJpYXQiOjE3NzM3MjExODYsImV4cCI6MTc3MzgwNzU4Nn0.zSkM8FsKWwAHH67G84-x_BIP47i5-ZhzwROebP_CWsc
 
 ### A second example.  Each request **MUST** be delimited by a triple hash
 POST http://localhost:3000/api/test
@@ -21,6 +22,7 @@ GET http://localhost:3000/api/images/69afc3cceb1292647e3d0cc6
 ### Rename image - success (204)
 PATCH http://localhost:3000/api/images/69afc3cceb1292647e3d0cc7
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5ld3VzZXIiLCJpYXQiOjE3NzM3MjExODYsImV4cCI6MTc3MzgwNzU4Nn0.zSkM8FsKWwAHH67G84-x_BIP47i5-ZhzwROebP_CWsc
 
 { "name": "My New Image Name" }
 
@@ -47,3 +49,33 @@ PATCH http://localhost:3000/api/images/invalid-id
 Content-Type: application/json
 
 { "name": "Valid Name" }
+
+### Register user - success (201)
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{ "username": "newuser", "password": "password123", "email": "test@email.com"}
+
+### Register user - missing fields (400)
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{ "username": "fail", "password": "password123" }
+
+### Register user - username taken (409)
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{ "username": "newuser", "password": "password123", "email": "test@email.com"}
+
+### Get user token - success (200)
+POST http://localhost:3000/api/auth/tokens
+Content-Type: application/json
+
+{ "username": "newuser", "password": "password123" }
+
+### Get user token - invalid credentials (401)
+POST http://localhost:3000/api/auth/tokens
+Content-Type: application/json
+
+{ "username": "newuser", "password": "wrongpassword" }

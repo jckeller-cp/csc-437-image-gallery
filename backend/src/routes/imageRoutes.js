@@ -19,6 +19,16 @@ export function registerImageRoutes(app, imageProvider) {
     const { imageId } = req.params;
     const { name } = req.body;
 
+    const { username } = req.userInfo || {};
+
+    if (!username) {
+      res.status(401).send({
+        error: "Unauthorized",
+        message: "Authentication required to rename images",
+      });
+      return;
+    }
+
     if (!name || typeof name !== "string") {
       res.status(400).send({
         error: "Bad Request",
@@ -43,15 +53,26 @@ export function registerImageRoutes(app, imageProvider) {
       return;
     }
 
-    imageProvider.renameImage(new ObjectId(imageId), name).then((result) => {
-      if (result.matchedCount === 0) {
+    imageProvider.getImageAuthorId(new ObjectId(imageId)).then((image) => {
+      if (!image) {
         res.status(404).send({
           error: "Not Found",
           message: "Image does not exist",
         });
-      } else {
-        res.status(204).send();
+        return;
       }
+
+      if (image.authorId !== username) {
+        res.status(403).send({
+          error: "Forbidden",
+          message: "This user does not own this image",
+        });
+        return;
+      }
+
+      return imageProvider.renameImage(new ObjectId(imageId), name).then(() => {
+        res.status(204).send();
+      });
     });
   });
 
