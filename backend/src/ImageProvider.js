@@ -43,6 +43,10 @@ export class ImageProvider {
     );
   }
 
+  createImage(imageData) {
+    return this.collection.insertOne(imageData);
+  }
+
   getImageById(imageId) {
     return this.collection
       .aggregate([
