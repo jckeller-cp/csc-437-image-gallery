@@ -1,6 +1,11 @@
 import { useState } from "react";
 
-export function ImageNameEditor({ imageId, initialValue, onNameChange }) {
+export function ImageNameEditor({
+  imageId,
+  initialValue,
+  authToken,
+  onNameChange,
+}) {
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(initialValue || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -16,12 +21,17 @@ export function ImageNameEditor({ imageId, initialValue, onNameChange }) {
     try {
       const response = await fetch(`/api/images/${imageId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
         body: JSON.stringify({ name: nameInput }),
       });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.message ?? `HTTP ${response.status} ${response.statusText}`);
+        throw new Error(
+          data.message ?? `HTTP ${response.status} ${response.statusText}`,
+        );
       }
       onNameChange(nameInput);
       setIsEditingName(false);

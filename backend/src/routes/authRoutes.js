@@ -25,6 +25,20 @@ function generateAuthToken(username) {
   });
 }
 
+function trySendAuthTokenResponse(res, tokenPromise) {
+  tokenPromise
+    .then((token) => {
+      res.status(200).send({ token });
+    })
+    .catch((error) => {
+      console.error("Error generating auth token:", error);
+      res.status(500).send({
+        error: "Internal Server Error",
+        message: "Failed to generate auth token",
+      });
+    });
+}
+
 export function registerAuthRoutes(app, credentialsProvider) {
   app.post("/api/users", (req, res) => {
     const { username, email, password } = req.body;
@@ -57,7 +71,7 @@ export function registerAuthRoutes(app, credentialsProvider) {
       .registerUser(username, email, password)
       .then((success) => {
         if (success) {
-          res.status(201).send();
+          trySendAuthTokenResponse(res, generateAuthToken(username));
         } else {
           res.status(409).send({
             error: "Conflict",
@@ -88,17 +102,7 @@ export function registerAuthRoutes(app, credentialsProvider) {
 
     credentialsProvider.verifyPassword(username, password).then((valid) => {
       if (valid) {
-        generateAuthToken(username)
-          .then((token) => {
-            res.status(200).send({ token });
-          })
-          .catch((error) => {
-            console.error("Error generating auth token:", error);
-            res.status(500).send({
-              error: "Internal Server Error",
-              message: "Failed to generate auth token",
-            });
-          });
+        trySendAuthTokenResponse(res, generateAuthToken(username));
       } else {
         res.status(401).send({
           error: "Unauthorized",
